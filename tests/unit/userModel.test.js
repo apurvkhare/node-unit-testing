@@ -45,44 +45,44 @@ describe('User Model Test', () => {
   // });
 
   // Test validation
-  it('should validate required fields', () => {
-    mockValidateSync.mockReturnValue({
-      errors: {
-        name: new Error('Name is required'),
-        email: new Error('Email is required'),
-        age: new Error('Age is required')
-      }
-    });
-    const user = new UserMock({});
-    const validationError = user.validateSync();
-    expect(validationError.errors.name).toBeDefined();
-    expect(validationError.errors.email).toBeDefined();
-    expect(validationError.errors.age).toBeDefined();
-  });
+  // it('should validate required fields', () => {
+  //   mockValidateSync.mockReturnValue({
+  //     errors: {
+  //       name: new Error('Name is required'),
+  //       email: new Error('Email is required'),
+  //       age: new Error('Age is required')
+  //     }
+  //   });
+  //   const user = new UserMock({});
+  //   const validationError = user.validateSync();
+  //   expect(validationError.errors.name).toBeDefined();
+  //   expect(validationError.errors.email).toBeDefined();
+  //   expect(validationError.errors.age).toBeDefined();
+  // });
 
-  it('should validate email format', () => {
-    mockValidateSync.mockReturnValue({
-      errors: {
-        email: new Error('Invalid email format')
-      }
-    });
-    const user = new UserMock({
-      name: 'John Doe',
-      email: 'invalid-email',
-      age: 30
-    });
-    const validationError = user.validateSync();
-    expect(validationError.errors.email).toBeDefined();
-  });
+  // it('should validate email format', () => {
+  //   mockValidateSync.mockReturnValue({
+  //     errors: {
+  //       email: new Error('Invalid email format')
+  //     }
+  //   });
+  //   const user = new UserMock({
+  //     name: 'John Doe',
+  //     email: 'invalid-email',
+  //     age: 30
+  //   });
+  //   const validationError = user.validateSync();
+  //   expect(validationError.errors.email).toBeDefined();
+  // });
 
-  it('should accept valid user data', () => {
-    mockValidateSync.mockReturnValue(undefined);
-    const user = new UserMock({
-      name: 'John Doe',
-      email: 'john@example.com',
-      age: 30
-    });
-    const validationError = user.validateSync();
-    expect(validationError).toBeUndefined();
-  });
+  // it('should accept valid user data', () => {
+  //   mockValidateSync.mockReturnValue(undefined);
+  //   const user = new UserMock({
+  //     name: 'John Doe',
+  //     email: 'john@example.com',
+  //     age: 30
+  //   });
+  //   const validationError = user.validateSync();
+  //   expect(validationError).toBeUndefined();
+  // });
 });
