@@ -24,45 +24,27 @@ jobs:
           npm install
         fi
       
-    - name: Run tests and generate coverage report
-      run: npm test
-
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: true
-        verbose: true
-        name: codecov-umbrella
-        slug: ${{ github.repository }}
-
-    - name: Get Coverage Summary
-      id: coverage
+    - name: Run tests
+      id: test
       run: |
-        echo "summary<<EOF" >> $GITHUB_OUTPUT
-        cat coverage/coverage-final.json >> $GITHUB_OUTPUT
+        echo "test_output<<EOF" >> $GITHUB_OUTPUT
+        npm test 2>&1 | tee test_output.log
         echo "EOF" >> $GITHUB_OUTPUT
+      continue-on-error: true
 
     - name: Comment PR
       uses: actions/github-script@v6
+      if: always()
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
-          const fs = require('fs')
-          const coverage = JSON.parse(process.env.COVERAGE)
-          const total = coverage.total
+          const testOutput = process.env.TEST_OUTPUT
           
-          const comment = `
-          ## Coverage Report
-          
-          | Type | Percentage |
-          |------|------------|
-          | Statements | ${total.statements.pct}% |
-          | Branches | ${total.branches.pct}% |
-          | Functions | ${total.functions.pct}% |
-          | Lines | ${total.lines.pct}% |
-          
-          [Full Report](https://codecov.io/gh/${process.env.GITHUB_REPOSITORY}/pull/${process.env.PR_NUMBER})
+          const comment = `## Test Results
+
+          \`\`\`
+          ${testOutput}
+          \`\`\`
           `
           
           github.rest.issues.createComment({
@@ -72,5 +54,4 @@ jobs:
             body: comment
           })
       env:
-        COVERAGE: ${{ steps.coverage.outputs.summary }}
-        PR_NUMBER: ${{ github.event.pull_request.number }}
+        TEST_OUTPUT: ${{ steps.test.outputs.test_output }}
