@@ -1,6 +1,7 @@
 const User = require('../models/user');
 
 exports.createUser = async (userData) => {
+  // console.log("userData: ", userData);
   return await User.create(userData);
 };
 
