@@ -72,17 +72,17 @@ describe('User Routes', () => {
     expect(userController.deleteUser).toHaveBeenCalledWith('123');
   });
 
-  // it('should handle errors when creating a user', async () => {
-  //   const mockError = new Error('Database error');
-  //   userController.createUser.mockRejectedValue(mockError);
+  it('should handle errors when creating a user', async () => {
+    const mockError = new Error('Database error');
+    userController.createUser.mockRejectedValue(mockError);
 
-  //   const res = await request(app)
-  //     .post('/users')
-  //     .send({ name: 'John Doe', email: 'john@example.com', age: 30 });
+    const res = await request(app)
+      .post('/users')
+      .send({ name: 'John Doe', email: 'john@example.com', age: 30 });
 
-  //   expect(res.statusCode).toBe(400);
-  //   expect(res.body).toEqual({ message: 'Database error' });
-  // });
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toEqual({ message: 'Database error' });
+  });
 
   it('should handle errors when getting all users', async () => {
     const mockError = new Error('Database error');
