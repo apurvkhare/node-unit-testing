@@ -1,4 +1,4 @@
-name: Run Unit Tests and Report Coverage
+name: Run Tests and Check Coverage
 
 on:
   pull_request:
@@ -6,9 +6,10 @@ on:
 
 permissions:
   pull-requests: write
+  checks: write
 
 jobs:
-  test:
+  test-and-coverage:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,20 +21,49 @@ jobs:
         node-version: '18.x'
         
     - name: Install dependencies
-      run: |
-        if [ -f package-lock.json ]; then
-          npm ci
-        else
-          npm install
-        fi
+      run: npm install
       
-    - name: Run tests
-      id: test
+    - name: Run tests with coverage
+      run: npm test -- --coverage
+      
+    - name: Check coverage
+      id: coverage
       run: |
-        echo "test_output<<EOF" >> $GITHUB_OUTPUT
-        npm test 2>&1 | tee test_output.log
-        echo "EOF" >> $GITHUB_OUTPUT
-      continue-on-error: true
+        COVERAGE=$(node -e "
+          const fs = require('fs');
+          const coverage = JSON.parse(fs.readFileSync('./coverage/coverage-final.json', 'utf8'));
+          const totalStatements = Object.values(coverage).reduce((sum, file) => sum + Object.keys(file.s).length, 0);
+          const coveredStatements = Object.values(coverage).reduce((sum, file) => sum + Object.values(file.s).filter(v => v > 0).length, 0);
+          const percentage = (coveredStatements / totalStatements * 100).toFixed(2);
+          console.log(percentage);
+        ")
+        echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+        if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+          echo "status=failure" >> $GITHUB_OUTPUT
+        else
+          echo "status=success" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create Coverage Status Check
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const coverage = ${{ steps.coverage.outputs.coverage }}
+          const status = '${{ steps.coverage.outputs.status }}'
+          github.rest.checks.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            name: 'Code Coverage',
+            head_sha: context.payload.pull_request.head.sha,
+            status: 'completed',
+            conclusion: status,
+            output: {
+              title: 'Code Coverage',
+              summary: `Coverage: ${coverage}%`,
+              text: status === 'success' ? 'Coverage meets the required threshold.' : 'Coverage is below the required threshold of 80%.'
+            }
+          })
 
     - name: Comment PR
       uses: actions/github-script@v6
@@ -43,12 +73,16 @@ jobs:
         script: |
           const fs = require('fs');
           const testOutput = fs.readFileSync('test_output.log', 'utf8');
+          const coverage = ${{ steps.coverage.outputs.coverage }};
           
           const comment = `## Test Results
 
           \`\`\`
           ${testOutput}
           \`\`\`
+
+          ## Coverage Report
+          Total Coverage: ${coverage}%
           `;
           
           github.rest.issues.createComment({
