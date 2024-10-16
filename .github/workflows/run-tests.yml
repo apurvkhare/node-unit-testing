@@ -41,14 +41,15 @@ jobs:
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
-          const testOutput = process.env.TEST_OUTPUT
+          const fs = require('fs');
+          const testOutput = fs.readFileSync('test_output.log', 'utf8');
           
           const comment = `## Test Results
 
           \`\`\`
           ${testOutput}
           \`\`\`
-          `
+          `;
           
           github.rest.issues.createComment({
             issue_number: context.issue.number,
@@ -56,5 +57,3 @@ jobs:
             repo: context.repo.repo,
             body: comment
           })
-      env:
-        TEST_OUTPUT: ${{ steps.test.outputs.test_output }}
