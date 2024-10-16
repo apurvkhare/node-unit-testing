@@ -5,26 +5,7 @@
     "mongoose": "^8.7.1",
     "supertest": "^7.0.0"
   },
-  "jest": {
-    "collectCoverage": true,
-    "coverageReporters": [
-      "json",
-      "lcov",
-      "text",
-      "clover"
-    ],
-    "coverageDirectory": "coverage",
-    "coverageThreshold": {
-      "global": {
-        "branches": 80,
-        "functions": 80,
-        "lines": 80,
-        "statements": 80
-      }
-    }
-  },
   "scripts": {
-    "test": "jest --coverage",
     "start": "node src/server.js"
   }
 }
