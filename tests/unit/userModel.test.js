@@ -44,21 +44,21 @@ describe('User Model Test', () => {
   //   expect(mongoose.model).toHaveBeenCalledWith('User', expect.objectContaining(mockSchema));
   // });
 
-  // Test validation
-  // it('should validate required fields', () => {
-  //   mockValidateSync.mockReturnValue({
-  //     errors: {
-  //       name: new Error('Name is required'),
-  //       email: new Error('Email is required'),
-  //       age: new Error('Age is required')
-  //     }
-  //   });
-  //   const user = new UserMock({});
-  //   const validationError = user.validateSync();
-  //   expect(validationError.errors.name).toBeDefined();
-  //   expect(validationError.errors.email).toBeDefined();
-  //   expect(validationError.errors.age).toBeDefined();
-  // });
+  Test validation
+  it('should validate required fields', () => {
+    mockValidateSync.mockReturnValue({
+      errors: {
+        name: new Error('Name is required'),
+        email: new Error('Email is required'),
+        age: new Error('Age is required')
+      }
+    });
+    const user = new UserMock({});
+    const validationError = user.validateSync();
+    expect(validationError.errors.name).toBeDefined();
+    expect(validationError.errors.email).toBeDefined();
+    expect(validationError.errors.age).toBeDefined();
+  });
 
   // it('should validate email format', () => {
   //   mockValidateSync.mockReturnValue({
