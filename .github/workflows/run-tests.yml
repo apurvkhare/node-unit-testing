@@ -40,7 +40,7 @@ jobs:
       id: coverage
       run: |
         echo "summary<<EOF" >> $GITHUB_OUTPUT
-        cat coverage/coverage-summary.json >> $GITHUB_OUTPUT
+        cat coverage/coverage-final.json >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
 
     - name: Comment PR
