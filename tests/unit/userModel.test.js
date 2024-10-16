@@ -44,7 +44,6 @@ describe('User Model Test', () => {
   //   expect(mongoose.model).toHaveBeenCalledWith('User', expect.objectContaining(mockSchema));
   // });
 
-  Test validation
   it('should validate required fields', () => {
     mockValidateSync.mockReturnValue({
       errors: {
